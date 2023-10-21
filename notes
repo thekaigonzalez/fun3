@@ -1,0 +1,91 @@
+states:
+
+        START   := the starts of expressions (more than likely a keyword or
+        function depending on the strutcure of the file)
+
+        STATE_DECL_NAME := the name of the state declaration fn [name ...] { ... }
+        
+        STATE_DECL_BODY := the body of the state declaration (the stuff in
+        braces)
+                            - stuff about this: use lexer to gain the body
+                            without any sort of mishaps on the matching braces. 
+inline:
+
+        f3 (fun 3) will allow for inline code because of the way it handles
+        scripts. every statement is a value, no matter how far up it is in it's
+        statement hierarchy.
+
+        for example, take expression `print [add 1 2]` for example, the
+        statement will be evaluated with multiple steps, like so
+
+        [add 1 2]
+        [3]
+        print [3]
+
+        this could technically be called "optimization", but it's really only
+        for recursion and ensuring that each value actually has more than just a
+        simple notation.
+
+errors:
+
+        fun3 will handle errors using D exceptions. one can catch these errors
+        using a simple try {} catch {} loop.
+
+        each error will always throw a message, but how the program handles the
+        error thrown is up to the programmer.
+
+base rules / standards:
+
+        fun is a programming language based on princple. it uses simple
+        goto/retrieve statements to execute code. if not maintained well code
+        can quickly get out of hand.
+
+        for example, this code:
+
+                fn main {
+                    print [add 1 2];
+                }
+
+        is valid code.
+
+        and this:
+
+                fn n {
+                    print [add 1 2];
+                    do main;
+                }
+
+                fn main {
+                    do n;
+                }
+
+        is also valid. except it will never stop running due to main calling `n'
+        and `n' calling `main'.
+
+        fun WILL contain
+
+                * code blocks
+                * builtin functions like `print', `add', and `do'
+                * keywords like `fn' to manage said code blocks
+                * variables (in previous versions they were stored in a global
+                scope, with fun3 they are now returned by the parser/evaluator)
+
+        here is a display of all the features mentioned above:
+
+                fn main {
+                        print "Hello, world!";
+                        do next;
+                }
+
+                fn next {
+                        # allows movement to different blocks throughout the
+                        # code, this language is very recursive and while it is
+                        # a benefit, it can get out of hand if not used properly.
+                        # but as a foundation it is good to teach other people
+                        # using the language itself.
+                        print "call from (next)";
+                }
+
+        :============================================================================:
+
+        
