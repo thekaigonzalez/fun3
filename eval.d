@@ -165,7 +165,8 @@ fun3_Function[string] fun3_evaluate(string statement)
     fun3_Stat current_stat;
     foreach (ASTNode node; a.node)
     { // evaluate all root statements
-        if (node.arg.length == 0) {
+        if (node.arg.length == 0)
+        {
             error([node.id], "F3RootCallException");
         }
         current.name = node.arg[0];
@@ -204,9 +205,39 @@ fun3_Value fun3_run_function(fun3_env* env, fun3_Function f)
         {
             env.builtin_functions[stat.fname](env, stat.args);
         }
-        else if (stat.fname in env.user_functions) {
+        else if (stat.fname in env.user_functions)
+        {
             fun3_run_function(env, env.user_functions[stat.fname]);
-        } else {
+        }
+        else
+        {
+            writefln("fun3: in invocation of ('%s')", stat.fname);
+
+            writefln("\t\x1b[31;1mfun3:\x1b[0m function '%s' not found", stat.fname);
+
+            string exp = "";
+
+            foreach (string n; keys(env.builtin_functions))
+            {
+                if (levenshteinDistance(stat.fname, n) < 3)
+                {
+                    exp = n;
+                }
+            }
+
+            foreach (string n; keys(env.user_functions))
+            {
+                if (levenshteinDistance(stat.fname, n) < 3)
+                {
+                    exp = n;
+                }
+            }
+
+            if (exp != "")
+            {
+                writefln("\t\x1b[31;1mfun3:\x1b[0m did you mean '%s'?", exp);
+            }
+
             error([stat.fname], "F3FunctionNotFoundException");
         }
     }
@@ -246,7 +277,8 @@ fun3_Value fun3_exec(fun3_env* env, ASTNode node)
         return env.builtin_functions[function_name](env, real_args);
     }
 
-    else {
+    else
+    {
         writefln("fun3: in invocation of ('%s')", function_name);
         writefln("\t\x1b[31;1mfun3:\x1b[0m function '%s' not found", function_name);
 
@@ -254,7 +286,16 @@ fun3_Value fun3_exec(fun3_env* env, ASTNode node)
 
         foreach (string n; keys(env.builtin_functions))
         {
-            if (levenshteinDistance(function_name, n) < 3) {
+            if (levenshteinDistance(function_name, n) < 3)
+            {
+                exp = n;
+            }
+        }
+
+        foreach (string n; keys(env.user_functions))
+        {
+            if (levenshteinDistance(function_name, n) < 3)
+            {
                 exp = n;
             }
         }
@@ -286,9 +327,11 @@ fun3_Stat[] fun3_convert_to_stats(ASTNode n)
 {
     // simply converts an ASTNode to a fun3_Stat array
     fun3_Stat[] stats;
-    if (n.type != ASTNodeType.ASTDecl) return stats;
+    if (n.type != ASTNodeType.ASTDecl)
+        return stats;
 
-    foreach (ASTNode node; n.next[0].node) {
+    foreach (ASTNode node; n.next[0].node)
+    {
         stats ~= fun3_Stat(node.id, fun3_create_from_ast_node(node));
     }
 
@@ -301,11 +344,13 @@ fun3_Value fun3_aexec(fun3_env* env, string statement, bool sub = false)
     AST ast = generate_ast(statement);
     statement = strip(statement);
 
-    if (startsWith(statement, '[')) {
+    if (startsWith(statement, '['))
+    {
         return fun3_aexec(env, statement[1 .. lastIndexOf(statement, ']')] ~ ";", true);
     }
 
-    if (startsWith(statement, '"')) {
+    if (startsWith(statement, '"'))
+    {
         return fun3_create_value(statement);
     }
 
@@ -351,7 +396,8 @@ fun3_Value fun3_aexec(fun3_env* env, string statement, bool sub = false)
             }
             else
             {
-                env.user_functions[node.arg[0]] = create_function(node.arg[0], fun3_convert_to_stats(node));
+                env.user_functions[node.arg[0]] = create_function(node.arg[0], fun3_convert_to_stats(
+                        node));
             }
         }
     }
