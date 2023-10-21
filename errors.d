@@ -54,6 +54,39 @@ class F3UnbalancedBracesException : Exception
 }
 
 /** 
+ * function not found error
+ */
+class F3FunctionNotFoundException : Exception
+{
+    this(string msg, string file = __FILE__, size_t line = __LINE__,
+        Throwable nextInChain = null) pure nothrow @nogc @safe
+    {
+        super(msg, file, line, nextInChain);
+    }
+}
+
+/** root call expected error
+ */
+class F3RootCallException : Exception
+{
+    this(string msg, string file = __FILE__, size_t line = __LINE__,
+        Throwable nextInChain = null) pure nothrow @nogc @safe
+    {
+        super(msg, file, line, nextInChain);
+    }
+}
+
+/** missing ; error */
+class F3MissingSemicolonException : Exception
+{
+    this(string msg, string file = __FILE__, size_t line = __LINE__,
+        Throwable nextInChain = null) pure nothrow @nogc @safe
+    {
+        super(msg, file, line, nextInChain);
+    }
+}
+
+/** 
  * Throws an error based on `type`
  * Params:
  *   args = an array of strings containing arguments for the error. depending on
@@ -74,6 +107,15 @@ int error(string[] args, string type = "F3Exception", int exit_code = 1)
         break;
     case "F3UnbalancedBracesException":
         throw new F3UnbalancedBracesException("unbalanced braces");
+        break;
+    case "F3FunctionNotFoundException":
+        throw new F3FunctionNotFoundException("function '%s' not found".format(args[0]));
+        break;
+    case "F3RootCallException":
+        throw new F3RootCallException("root call expected");
+        break;
+    case "F3MissingSemicolonException":
+        throw new F3MissingSemicolonException("missing ;");
         break;
     default:
         break;
