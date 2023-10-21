@@ -5,6 +5,10 @@ what is fun?
         goto/retrieve statements to execute code. if not maintained well code
         can quickly get out of hand.
 
+        fun3 is memory safe, fun3 has no recursion which means there are
+        practically no possible ways to crash a fun3 program, this makes it good
+        to use as either a foundation or as a learning tool for more beginner individuals.
+
         for example, this code:
 
                 fn main {
@@ -26,6 +30,22 @@ what is fun?
 
         is also valid. except it will never stop running due to main calling `n'
         and `n' calling `main'.
+
+        HOWEVER, fun3 fixes these issues by disallowing usage of functions
+        defined after the other, that will now print an error message:
+
+                fun3: in invocation of ('main')
+                fun3: function 'main' not found
+                fun3: did you mean 'join'?
+        
+        fun3 has no true concept of recursion, so even this code itself:
+
+                fn main {
+                    main;
+                }
+
+        will not work. this prevents exhaustion of the call stack and prevents
+        memory stack overflows.
 
         (specifically) fun3 contains
 
