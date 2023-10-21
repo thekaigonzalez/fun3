@@ -1,0 +1,28 @@
+fn ladder {
+    print "(ladder)";
+}
+
+fn block {
+    # block runs ladder
+    print "(block)";
+    ladder;
+}
+
+fn new {
+    # new runs ladder
+    print "(new)";
+    ladder;
+}
+
+fn script {
+    # script runs block and new
+    print "(script)";
+    block;
+    new;
+}
+
+fn main {
+    # main runs script
+    print "(main)";
+    script;
+}
