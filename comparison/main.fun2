@@ -1,0 +1,24 @@
+fn ladder {
+    print "(ladder)"
+}
+
+fn block {
+    print "(block)"
+    do "ladder"
+}
+
+fn new {
+    print "(new)"
+    do "ladder"
+}
+
+fn script {
+    print "(script)"
+    do "block"
+    do "new"
+}
+
+fn main {
+    print "(main)"
+    do "script"
+}
