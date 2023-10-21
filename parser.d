@@ -5,6 +5,8 @@ import errors;
 
 import std.stdio : writefln;
 import std.string : strip, endsWith;
+import std.ascii : isAlpha, isDigit;
+import std.conv : to;
 
 // parses statements
 
@@ -206,25 +208,36 @@ AST generate_ast(string statement)
 
     ASTNode current;
 
+    f3lexerState prev;
+
     string tmp = "";
 
     int depth = 0;
     int i = 0;
 
     LexToken t;
-
+    s.line = 1;
+    s.col = 1;
     /**
         to ensure the last character is actually noted
     */
     while (!lex_eof(&s) || t != LexToken())
     {
+        s.col++;
         auto token = lex_get_token(&s);
         auto state = lex_get_state(&s);
 
         t = lex_next(&s); // keeping track of the current and the next character
 
-        if (token.type == f3charType.WHITESPACE &&
-            state == f3lexerState.STATE_START && strip(tmp).length > 0) /* [fn ...] */
+        if (token.type == f3charType.NEWLINE)
+        {
+            s.line++;
+            s.col = 0;
+        }
+
+        if ((token.type == f3charType.WHITESPACE || token.type == f3charType.NEWLINE) &&
+            state == f3lexerState.STATE_START && strip(tmp).length > 0 && state != f3lexerState
+            .STATE_COMMENT) /* [fn ...] */
         {
             // we always have to strip whitespaces from the temporary buffer
             // before doing anything else. to prevent any ugly ass names i will
@@ -325,14 +338,16 @@ AST generate_ast(string statement)
             tmp = "";
         }
         else if (token.type == f3charType.DECL_BODY_BEGIN
-            && state == f3lexerState.STATE_DECL_BODY) /* { { ... } } */
+            && state == f3lexerState.STATE_DECL_BODY
+            && state != f3lexerState.STATE_COMMENT) /* { { ... } } */
         {
             depth++;
             goto c;
         }
 
         else if (token.type == f3charType.DECL_BODY_END
-            && state == f3lexerState.STATE_DECL_BODY)
+            && state == f3lexerState.STATE_DECL_BODY
+            && state != f3lexerState.STATE_COMMENT)
         {
             depth--;
             goto c;
@@ -349,9 +364,59 @@ AST generate_ast(string statement)
             tmp = "";
         }
 
+        else if (token.type == f3charType.COMMENT && state != f3lexerState.STATE_STRING)
+        {
+            prev = s.state;
+            s.state = f3lexerState.STATE_COMMENT;
+
+            tmp = "";
+        }
+
+        else if (token.type == f3charType.NEWLINE && state == f3lexerState.STATE_COMMENT)
+        {
+            s.state = prev;
+            tmp = "";
+        }
+
+        else if (token.type == f3charType.END && state == f3lexerState.STATE_START)
+        {
+            current.id = strip(tmp);
+            current.type = ASTNodeType.ASTCall;
+
+            ast_add_node(&ast, current);
+
+            s.state = f3lexerState.STATE_START;
+            current = ASTNode();
+            tmp = "";
+        }
+
+        else if (token.type == f3charType.NEWLINE && state == f3lexerState.STATE_FN_ARGS)
+        {
+            writefln("\x1b[31;1mfun3(%d:%d)\x1b[0m: expected ';'\n\tnear:\n\t\t\x1b[32;3m%s\x1b[0m", s.line, s.col, tmp);
+            writefln(
+                "\x1b[31;3mfun3: note: newline-separated statements are not supported in fun3\x1b[0m");
+            error([], "F3MissingSemicolonException");
+        }
+
         else
         {
+            if (state == f3lexerState.STATE_COMMENT)
+            {
+                continue;
+            }
         c:
+            if (state != f3lexerState.STATE_STRING
+                || state != f3lexerState.STATE_COMMENT)
+            {
+                if (!isAlpha(token.tok) && !isDigit(token.tok) && token.type == f3charType.UNKNOWN)
+                {
+                    writefln(
+                        "\x1b[31;1mfun3(%d:%d)\x1b[0m: unexpected token: %s\t%s('%c')",
+                        s.line, s.col, token.tok, tmp, token.tok);
+                    writefln("\x1b[31;3mfun3: note: where ('TOKEN') is the faulty token\x1b[0m");
+                    error([to!string(token.tok)], "F3UnexpectedTokenException", token.tok);
+                }
+            }
             tmp ~= token.tok;
         }
 
@@ -359,7 +424,10 @@ AST generate_ast(string statement)
     }
 
     if (depth > 0)
+    {
+        writefln("\x1b[31;1mfun3(%d:%d)\x1b[0m: unbalanced braces", s.line, s.col);
         error([], "F3UnbalancedBracesException");
+    }
 
     if (tmp.length > 0)
     {
