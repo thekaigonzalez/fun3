@@ -1,7 +1,7 @@
-fn new {
-    print "hello, world!";
-}
 fn main {
-    print [add 1 2];
-    new;
+    # print function
+    # comments are cool btw.
+    # you can do things like print [] hello world
+    
+    print [ad 1 5];
 }

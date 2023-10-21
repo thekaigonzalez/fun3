@@ -37,9 +37,10 @@ int main()
     fun3_env_add_function(&env, "print", &fun3_print);
     fun3_env_add_function(&env, "add", &fun3_add);
 
+    try {
     fun3_aexec(&env, text); // note: ignore the return value of fun3_exec() by all costs
 
-    // writefln("%s", generate_ast("print \"Hello, world!\";"));
-    // writefln("%s", generate_ast("fn main { print \"Hello, world!\"; }"));
+    }
+    catch (Exception e) {}
     return 0;
 }
