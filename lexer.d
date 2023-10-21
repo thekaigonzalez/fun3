@@ -11,6 +11,7 @@ enum f3lexerState
 {
     STATE_START, // the start of an expression
     STATE_STRING, // the start of a string
+    STATE_COMMENT, // the start of a comment
     STATE_INLINE, // inside of an inline statement
     STATE_DECL_NAME, // the name of a declaration fn [name ...]
     STATE_DECL_BODY, // the body of a declaration fn [name ...] { ... }
@@ -145,6 +146,8 @@ f3charType lex_token_type(char t)
         return f3charType.INLINE_BEGIN;
     case ']':
         return f3charType.INLINE_END;
+    case '#':
+        return f3charType.COMMENT;
     default:
 
         if (isSymbol(t)) /* is a symbol? (!, @, #) */
