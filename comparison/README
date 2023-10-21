@@ -1,0 +1,42 @@
+note that every version of fun has a SLIGHTLY different syntax, however, the
+control flow is the same on all interpreters. this is a speed and level of
+stability comparison.
+
+fun3 main.fun3:
+
+    (main)
+    (script)
+    (block)
+    (ladder)
+    (new)
+    (ladder)
+
+    real    0m0.009s
+    user    0m0.007s
+    sys     0m0.002s
+
+fun1 main.fun1:
+
+    (main)
+    (script)
+    (block)
+    (ladder)
+    (new)
+    (ladder)
+
+    real    0m0.010s
+    user    0m0.002s
+    sys     0m0.008s
+
+fun2 main.fun2:
+
+    (main)
+    (script)
+    (block)
+    (ladder)
+    (new)
+    (ladder)
+
+    real    0m0.009s
+    user    0m0.009s
+    sys     0m0.001s
