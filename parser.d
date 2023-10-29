@@ -239,6 +239,10 @@ AST generate_ast(string statement)
             state == f3lexerState.STATE_START && strip(tmp).length > 0 && state != f3lexerState
             .STATE_COMMENT) /* [fn ...] */
         {
+            // thank you to my wife, miranda. for keeping
+            // me sane and being an amazing wife
+            
+
             // we always have to strip whitespaces from the temporary buffer
             // before doing anything else. to prevent any ugly ass names i will
             // never fix
